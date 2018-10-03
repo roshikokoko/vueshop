@@ -1,5 +1,8 @@
 <template>
     <div>
+        <loading :active.sync="isLoading"></loading>
+
+
         <div class="text-right mt-4">
             <button class="btn btn-primary" @click="openModal(true)">建立新的產品</button>
         </div>
@@ -16,18 +19,22 @@
                 <tr v-for="(item) in products" :key="item.id">
                     <td>{{item.category}}</td>
                     <td>{{item.title}}</td>
-                    <td class="text-right">{{item.origin_price}}</td>
-                    <td class="text-right">{{item.price}}</td>
+                    <td class="text-right">{{item.origin_price | currency }}</td>
+                    <td class="text-right">{{item.price | currency }}</td>
                     <td>
                         <span v-if="item.is_enabled" class="text-success">啟用</span>
                         <span v-else>未啟用</span>
                     </td>
                     <td>
                         <button class="btn btn-outline-primary btn-sm" @click="openModal(false,item)">編輯</button>
+                        <button class="btn btn-outline-danger btn-sm" @click="openDelProductModal(item)">刪除</button>
                     </td>
                 </tr>
             </tbody>
         </table>
+
+        <Pagination :pages="pagination" @emitPages="getProducts"></Pagination>
+
         <!-- Modal -->
         <!--
         <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
@@ -72,13 +79,12 @@
                         </div>
                         <div class="form-group">
                         <label for="customFile">或 上傳圖片
-                            <i class="fas fa-spinner fa-spin"></i>
+                            <i class="fas fa-spinner fa-spin" v-if="status.fileUploading"></i>
                         </label>
                         <input type="file" id="customFile" class="form-control"
                             ref="files" @change="uploadFile">
                         </div>
-                        <img img="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=828346ed697837ce808cae68d3ddc3cf&auto=format&fit=crop&w=1350&q=80"
-                        class="img-fluid" alt="">
+                        <img class="img-fluid" :src="tempProduct.imageUrl" alt="">
                     </div>
                     <div class="col-sm-8">
                         <div class="form-group">
@@ -145,8 +151,9 @@
                 </div>
                 </div>
             </div>
-            </div>
-            <div class="modal fade" id="delProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        </div>
+
+        <div class="modal fade" id="delProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content border-0">
                 <div class="modal-header bg-danger text-white">
@@ -162,19 +169,18 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-danger"
-                    >確認刪除</button>
+                    <button type="button" class="btn btn-danger" @click="delProduct">確認刪除</button>
                 </div>
                 </div>
             </div>
-            </div>
-
         </div>
 
+    </div>
 </template>
 
 <script>
 import $ from 'jquery';
+import Pagination from '../Pagination';
 
 export default{
    data(){
@@ -182,16 +188,28 @@ export default{
            products: [],
            tempProduct:{},
            isNew : false,
+           isLoading: false,
+           status:{
+               fileUploading:false,
+           },
+           pagination: {},
        };
    } ,
+    components: {
+        Pagination,
+   },
    methods:{
-       getProducts(){
-            const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products`;
+       getProducts(page = 1){
+            const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products?page=${page}`;
             const vm = this;
             //  console.log(process.env.APIPATH);
+            vm.isLoading = true;
             this.$http.get(api).then((response) => {
                 console.log(response.data);
+                vm.isLoading = false;
                 vm.products = response.data.products;
+                vm.pagination = response.data.pagination;
+                
             });
        },
        updateProduct(){
@@ -217,35 +235,53 @@ export default{
             });
        },
        openModal(isNew, item){
-         
-           if(isNew){
+           if(isNew){ 
                this.tempProduct = {};
                this.isNew = true;
             } else {
                 this.tempProduct = Object.assign({},item);
-               this.isNew = false;
+                this.isNew = false;
             }
             $("#productModal").modal('show');
        },
+        openDelProductModal(item) {
+            const vm = this;
+            $('#delProductModal').modal('show');
+            vm.tempProduct = Object.assign({}, item);
+        },
+        delProduct(){
+            const vm = this;
+            const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
+            this.$http.delete(api).then((response) => {
+                console.log(response, vm.tempProduct);
+                $('#delProductModal').modal('hide');
+                vm.isLoading = false;
+                this.getProducts();
+            });
+        },
        uploadFile(){
-        console.log(this);   
-        const uploadFile = this.$refs.files.files[0];
-        const vm = this;
-        const formData = new FormData();
-        formData.append('fil-to-upload', uploadFile);
-        const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/upload`;
-        this.$http.post(url.formData,{
-            headers:{
-                'Content-Type':'multipart/form-data'
-            }
-        }).then((response)=>{
-            console.log(response.data);
-            if(response.data.success){
-                vm.tempProduct.imageUrl= response.data.imageUrl;
-                console.log(vm.tempProduct);
-                vm.$set(vm.tempProduct, 'imageUrl', response.data.imageUrl);
-            }
-        })
+           // console.log(this);   
+            const uploadFile = this.$refs.files.files[0];
+            const vm = this;
+            const formData = new FormData();
+            formData.append('file-to-upload', uploadFile);
+            const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/upload`;
+            vm.status.fileUploading = true;
+            this.$http.post(url,formData,{
+                headers:{
+                    'Content-Type': 'multipart/form-data',
+                }
+            }).then((response)=>{
+                //console.log(response.data);
+                if(response.data.success){
+                //  vm.tempProduct.imageUrl= response.data.imageUrl;
+                 vm.status.fileUploading = false;
+                    vm.$set(vm.tempProduct, 'imageUrl', response.data.imageUrl);
+                } else {
+                    this.$bus.$emit('messsage:push', response.data.message, 'danger');
+                }
+              //  console.log(vm.tempProduct);
+            })
        }
    },
    created() {
