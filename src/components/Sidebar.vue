@@ -16,7 +16,7 @@
               </li>
 
             </ul>
-<!--
+
 
               <h6 class="sidebar-heading d-flex justify-content-between
                 align-items-center px-3 mt-4 mb-1 text-muted">
@@ -25,7 +25,14 @@
                   <span data-feather="plus-circle"></span>
                 </a>
               </h6>
-      -->      
+              <ul class="nav flex-column mb-2">
+              <li class="nav-item">
+                <router-link to="/customer_order" class="nav-link">
+                   <i class="fab fa-product-hunt"></i> 模擬訂單
+                </router-link>
+              </li>
+
+            </ul>
 
           </div>
         </nav>     
