@@ -34,7 +34,7 @@
         </table>
 
         <Pagination :pages="pagination" @emitPages="getProducts"></Pagination>
-
+        
         <!-- Modal -->
         <!--
         <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
@@ -175,6 +175,9 @@
             </div>
         </div>
 
+
+
+ 
     </div>
 </template>
 
@@ -193,6 +196,7 @@ export default{
                fileUploading:false,
            },
            pagination: {},
+           cart:{},
        };
    } ,
     components: {
