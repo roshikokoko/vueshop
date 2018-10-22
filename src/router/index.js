@@ -1,11 +1,18 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 //import HelloWorld from '@/components/HelloWorld'
-import Dashboard from '@/components/Dashboard'
-import Login from '@/components/pages/Login'
-import Products from '@/components/pages/Products'
-import CustomerOrder from '@/components/pages/CustomerOrders';
-import CustomerCheckOut from '@/components/pages/CustomerCheckOut';
+
+//後台
+import Login from '@/components/admin/pages/Login'
+import Dashboard from '@/components/admin/Dashboard'
+import Products from '@/components/admin/pages/Products'
+import CustomerOrder from '@/components/admin/pages/CustomerOrders';
+import CustomerCheckOut from '@/components/admin/pages/CustomerCheckOut';
+
+//前台
+import Home from '@/components/frontend/pages/Home'
+import FDashboard from '@/components/frontend/Dashboard'
+import Cart from '@/components/frontend/pages/Cart'
 
 Vue.use(Router)
 
@@ -13,7 +20,7 @@ export default new Router({
   routes: [
     {
       path:'*',
-      redirect:'login',
+      redirect:'home',
     },
     /*
     {
@@ -23,6 +30,26 @@ export default new Router({
       meta:{requiresAuth:true}
     },
     */
+    {
+      path: '/',
+      name: 'FDashboard',
+      components:{
+          default:FDashboard,
+         // Sidebar,
+      },
+      children:[
+        {
+          path: 'home',
+          name: 'Home',
+          component: Home,
+        },
+        {
+          path:'cart',
+          name: 'Cart',
+          component: Cart,
+        }
+      ]
+    },
     {
       path: '/login',
       name: 'Login',
@@ -42,6 +69,8 @@ export default new Router({
         }
       ]
     },
+
+    /*
     {
       path: '/',
       name: 'Dashboard',
@@ -53,11 +82,12 @@ export default new Router({
           component: CustomerOrder,
         },
         {
-          path: 'customer_checkout',
+          path: 'customer_checkout/:orderId',
           name: 'CustomerCheckOut',
           component: CustomerCheckOut,
         },
       ]
-    },
+    }
+    */
   ]
 })

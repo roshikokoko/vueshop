@@ -17,7 +17,7 @@
 
             </ul>
 
-
+<!--
               <h6 class="sidebar-heading d-flex justify-content-between
                 align-items-center px-3 mt-4 mb-1 text-muted">
                 <span>模擬功能</span>
@@ -33,7 +33,7 @@
               </li>
 
             </ul>
-
+-->
           </div>
         </nav>     
     </div>

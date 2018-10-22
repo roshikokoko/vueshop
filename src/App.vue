@@ -2,7 +2,13 @@
   <div id="app">
     
     <router-view/>
-
+     <footer class="bg-dark text-muted py-5">
+      <div class="container">
+        <ul class="list-inline text-center">
+          <li class="list-inline-item">© Copright 2018 BeLieh</li>
+        </ul>
+      </div>
+    </footer>
   </div>
 </template>
 

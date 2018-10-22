@@ -278,7 +278,10 @@ export default {
                 console.log(result);
                 if (result) {
                     this.$http.post(url, { data: order }).then((response) => {
-                        console.log('訂單已建立', response);
+                        if(response.data.success){
+                            console.log('訂單已建立', response);
+                            vm.$router.push(`/customer_checkout/${response.data.orderId}`);
+                        }
                         vm.isLoading = false;
                     });
                 } else {
