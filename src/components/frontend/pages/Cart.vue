@@ -64,11 +64,11 @@ export default {
         getCart(){
             const vm=this;
             const url= `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
-            vm.isLoading = true;
+            vm.$store.state.isLoading = true;
             this.$http.get(url).then((response)=>{
-                console.log(response);
+                //console.log(response);
                 vm.cart = response.data.data;
-                vm.isLoading = false;
+                vm.$store.state.isLoading = false;
             });
         },
         addCouponCode(){
@@ -77,10 +77,10 @@ export default {
         removeCartItem(id){
             const vm=this;
             const url= `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart/${id}`;
-            vm.isLoading = true;
+            vm.$store.state.isLoading = true;
             this.$http.delete(url).then((response)=>{
                 vm.getCart();
-                vm.isLoading = false;
+                vm.$store.state.isLoading = false;
             });
         }
     },

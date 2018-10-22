@@ -106,7 +106,7 @@ export default {
         return {
             products:[],
             categories: [],
-            isLoading: false,
+       //     isLoading: false,
             searchText: '',
             searchText1:'',
             status:{
@@ -141,9 +141,10 @@ export default {
         getProducts(){
             const vm = this;
             const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products`;
-            vm.isLoading = true;
+            //vm.isLoading = true;
+            vm.$store.state.isLoading = true;
             this.$http.get(api).then((response)=>{
-                vm.isLoading = false;
+                vm.$store.state.isLoading = false;
                 vm.products = response.data.products;
             });
         },
@@ -154,11 +155,12 @@ export default {
         getProduct(id){
             const vm = this;
             const api= `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/product/${id}`;
-            vm.isLoading = true;
+            vm.$store.state.isLoading = true;
             this.$http.get(api).then((response)=>{
                 vm.product = response.data.product;
                 $('#productModal').modal('show');
                  vm.status.loadingItem = '';
+                 vm.$store.state.isLoading = false;
             });
         },
         //addToCart(id, qty=1){
@@ -215,11 +217,12 @@ export default {
         getCart(){
             const vm=this;
             const url= `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
-            vm.isLoading = true;
+            vm.$store.state.isLoading = true;
             this.$http.get(url).then((response)=>{
                console.log('getCart', response);
                 vm.cart = response.data.data;
-                vm.isLoading = false;
+               // vm.isLoading = false;
+               vm.$store.state.isLoading = false;
             });
         },
         /*

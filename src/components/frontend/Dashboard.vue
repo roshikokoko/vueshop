@@ -1,7 +1,9 @@
 <template>
 <div>
-    <Navbar></Navbar>
-    <router-view></router-view>
+  <loading :active.sync="isLoading"></loading>
+  
+  <Navbar></Navbar>
+  <router-view></router-view>
   </div>  
 </template>
 
@@ -13,7 +15,12 @@ export default {
     components:{
         Navbar,
        // Sidebar
-    }
+    },
+    computed: {
+        isLoading() {
+            return this.$store.state.isLoading;
+        }
+    },
 }
 </script>
 <style lang="scss">
